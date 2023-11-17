@@ -1,0 +1,145 @@
+import random
+#gives the apearance of rewriting the board on the screen
+clear = lambda: print('\n' * 20)
+#will be used as the game board; to hold the x's and o's and determine a win etc.
+test_board = ['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']# the '#' is at index 0 so that players can input 1 to use first position instead of 0
+
+
+# prints testboard with lines so that it appears like a real board
+def display_board(board):
+    print(board[1] + '|' + board[2] + '|' + board[3])
+    print('-|-|-')
+    print(board[4] + '|' + board[5] + '|' + board[6])
+    print('-|-|-')
+    print(board[7] + '|' + board[8] + '|' + board[9])
+
+
+# assigns x to player1 and o to player2
+def player_input():
+    marker = ''
+    while not (marker == 'x' or marker == 'o'): #this loop goes over and over untill the playerinput is an x or o.
+        marker = input('player1 please choose a marker. "x" or "o"')
+    if marker == 'x':
+        return ('x', 'o') # to assign x to player1 and o to player2 with tuple unpacking
+    else:
+        return ('o', 'x') # to assign o to player1 and x to player2 with tuple unpacking
+
+
+# converts a players integer input to and assings either x or o to the testboard's index of the input
+def place_marker(board, marker, position):
+    board[position] = marker
+
+
+# checks to board for a win
+def win_check(board, mark):
+    return ((board[1] == mark and board[2] == mark and board[3] == mark) or  # across top
+            (board[4] == mark and board[5] == mark and board[6] == mark) or  # across middle
+            (board[7] == mark and board[8] == mark and board[9] == mark) or  # across bottom
+            (board[1] == mark and board[4] == mark and board[7] == mark) or  # down left
+            (board[2] == mark and board[5] == mark and board[8] == mark) or  # down middle
+            (board[3] == mark and board[6] == mark and board[9] == mark) or  # down right
+            (board[1] == mark and board[5] == mark and board[9] == mark) or  # diagonal upper right to lower left
+            (board[3] == mark and board[5] == mark and board[7] == mark)  # diagonal upper left to lower right
+            )
+
+
+#chooses a player to go first
+def choose_first():
+    random_int = random.randint(1, 10)
+    if random_int % 2 == 0:
+        print('player1 may go first')
+        return True
+    else:
+        print('player2 may go first')
+        return False
+
+
+# when player gives index position, checks if index position is not already taken
+def space_check(board, position):
+    return board[position] == ' '
+
+
+# checks if the board is full
+def full_board_check(board):
+    for x in range(1, 10):
+        if space_check(board, x):
+            return False #the index position of the player's input is ' ' based on space_check so its False. i.e. empty
+    return True #the index position of the player's input is not ' ' based on space_check so its True. i.e. full
+
+
+# accepts the players position for where he wants to go
+def player_choice(board):
+    while True:
+        a = input('please input an integer 1-9')#will be the index position of test_board
+        try:
+            a = int(a)#must convert to int to be used in test_board indexing
+        except ValueError:#ensures that the players input is an integer
+            clear()
+            print('\n please type a number')
+            print('_____________________')
+            display_board(board)
+            continue
+        if a >= 1 and a <= 9:#since there are only nine positions in test_board, the players input must be between 1 and 9
+            if space_check(board, a):
+                return a #return a(player's input) to be used in test_board
+            elif a < 1 or a > 9:
+                print('please input an integer from 1-9')
+            else:
+                clear()
+                print('\n that space isn\'t available')
+                print('____________________________')
+                display_board(board)
+                continue
+
+
+# when game is over, replay the game
+def replay():
+    replay = input('press any key to play again. type "q" to quit')
+    while True:
+        if 'q' in replay:
+            return False
+            break
+        else:
+            return True
+            break
+
+
+while True:
+    #set the game up
+    test_board = ['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '] #at the begining of the game empty's the board.
+    #randomly select a player to go first
+    if choose_first():
+        player1,player2=player_input()
+    else:
+        player2,player1=player_input()
+    game_on=True
+    #players take turns
+    while game_on:
+        #player1's turn
+        display_board(test_board)
+        print('%s may go'% player1)
+        place_marker(test_board,player1,player_choice(test_board))#assings the players input to test_board
+        if win_check(test_board,player1):
+            display_board(test_board)
+            print('%s has won! \n game over'% player1)
+            break #breaks out of local loop and jumps to next loop (if not replay())
+        elif full_board_check(test_board):
+            display_board(test_board)
+            print('board is full')
+            break
+        #player2's turn
+        print('%s may go' % player2)
+        display_board(test_board)
+        place_marker(test_board,player2,player_choice(test_board))
+        if win_check(test_board,player2):
+            display_board(test_board)
+            print('%s has won! \n game over'% player2)
+        elif full_board_check(test_board):
+            display_board(test_board)
+            print('board is full')
+            break
+    if not replay():
+        break
+
+
+
