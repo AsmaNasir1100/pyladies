@@ -1,0 +1,105 @@
+import random
+#will be used as the game board; to hold the x's and o's 
+board = [
+    "", "", "",
+    "", "", "",
+    "", "", ""
+]
+
+winner = ""
+full_board = False
+
+ # win board
+def verify_winner(board):
+
+    if board[0] == board[1] == board[2] != "":
+        return board[0]
+    if board[3] == board[4] == board[5] != "":
+        return board[3]
+    if board[6] == board[7] == board[8] != "":
+        return board[6]
+
+    if board[0] == board[3] == board[6] != "":
+        return board[0]
+    if board[1] == board[4] == board[7] != "":
+        return board[1]
+    if board[2] == board[5] == board[8] != "":
+        return board[2]
+
+    if board[0] == board[4] == board[8] != "":
+        return board[0]
+    if board[2] == board[4] == board[6] != "":
+        return board[2]
+
+# function if board is full 
+def check_full_board():
+    counter = 0 #start from 0-9
+
+    for box in board:
+        if box:
+            counter += 1
+    if counter == 9:
+        return True
+    return False
+
+def draw_board(board): #draw board
+
+    for index , box in enumerate(board):
+
+        if index // 3 != (index - 1) // 3: #floor division
+            print("+---+---+---+")
+
+        if box:
+            print("| " + box + " ", end="") #to draw a box
+
+        else:
+            print("|   ", end="")
+
+        if index % 3 == 2: # lines
+            print("|")
+        if index == 8:
+            print("+---+---+---+")
+
+# defining winner or full board
+while not winner and not full_board:
+
+    draw_board(board)
+
+    box_number = -1
+    valid_input = False
+    while not valid_input:
+        box_number = int(input("Choose a box"))
+
+        if box_number < 1 or box_number > 9: #the box value should be between 1-9
+            print("Please choose a box between 1 and 9")
+
+        elif board[box_number - 1]: #define to select an empty box
+            print("Please choose an empty box")
+
+        else:
+            board[box_number - 1] = "X"
+            valid_input = True
+
+    winner = verify_winner(board) #check the winner board and saving it into another variable
+
+    if winner:
+        break
+
+    computer_play = -1 #playing against computer
+    while board[computer_play - 1] or computer_play == -1:
+        computer_play = random.randint(1, 9)
+
+    board[computer_play - 1] = "O"
+    print("Computer played box " + str(computer_play))
+
+    winner = verify_winner(board)
+
+    if full_board:
+        break
+
+if winner:
+    draw_board(board)
+    print("Winner is " + winner)
+else:
+    print("No winner")
+
